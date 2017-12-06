@@ -145,7 +145,6 @@ def update(ctx, assets):
 
     exportDoc = {}
     for asset in prices:
-        print (asset)
         exportDoc[asset] = {
             "price": prices[asset]["price"],
             "cer": prices[asset]["cer"],
@@ -159,17 +158,18 @@ def update(ctx, assets):
             "short_backing_symbol": prices[asset]["short_backing_symbol"]
             }
     print(exportDoc)
+
     # Get the DocumentDB settings from the environment variables
     ENDPOINT              = os.environ['ENDPOINT']
     MASTERKEY             = os.environ['MASTERKEY']
     DOCUMENTDB_DATABASE   = os.environ['DOCUMENTDB_DATABASE']
     DOCUMENTDB_COLLECTION = os.environ['DOCUMENTDB_COLLECTION']
-    print(ENDPOINT,MASTERKEY,DOCUMENTDB_DATABASE,DOCUMENTDB_COLLECTION)
-    # Initialize the Python DocumentDB client
+
+    # Initialize the CosmosDB client
     client = document_client.DocumentClient(ENDPOINT, {'masterKey': MASTERKEY})
 
+    # Store the pricing data in CosmosDB
     collectionUrl = "dbs/" + DOCUMENTDB_DATABASE + "/colls/" + DOCUMENTDB_COLLECTION
-    # Store the pricing data in DOcumentDB
     document1 = client.CreateDocument(collectionUrl, exportDoc)
 
     print_prices(prices)
