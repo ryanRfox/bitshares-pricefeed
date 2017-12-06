@@ -22,6 +22,10 @@ from .ui import (
     confirmalert,
     alert,
 )
+import pydocumentdb.documents as documents
+import pydocumentdb.document_client as document_client
+import pydocumentdb.errors as errors
+
 log = logging.getLogger(__name__)
 
 
@@ -138,80 +142,37 @@ def update(ctx, assets):
     feed.fetch()
     feed.derive(assets)
     prices = feed.get_prices()
+
+    exportDoc = {}
+    for asset in prices:
+        print (asset)
+        exportDoc[asset] = {
+            "price": prices[asset]["price"],
+            "cer": prices[asset]["cer"],
+            "mean": prices[asset]["mean"],
+            "median": prices[asset]["median"],
+            "weighted": prices[asset]["weighted"],
+            "std": prices[asset]["std"],
+            "number": prices[asset]["number"],
+            "mssr": prices[asset]["mssr"],
+            "mcr": prices[asset]["mcr"],
+            "short_backing_symbol": prices[asset]["short_backing_symbol"]
+            }
+    print(exportDoc)
+    # Get the DocumentDB settings from the environment variables
+    ENDPOINT              = os.environ['ENDPOINT']
+    MASTERKEY             = os.environ['MASTERKEY']
+    DOCUMENTDB_DATABASE   = os.environ['DOCUMENTDB_DATABASE']
+    DOCUMENTDB_COLLECTION = os.environ['DOCUMENTDB_COLLECTION']
+    print(ENDPOINT,MASTERKEY,DOCUMENTDB_DATABASE,DOCUMENTDB_COLLECTION)
+    # Initialize the Python DocumentDB client
+    client = document_client.DocumentClient(ENDPOINT, {'masterKey': MASTERKEY})
+
+    collectionUrl = "dbs/" + DOCUMENTDB_DATABASE + "/colls/" + DOCUMENTDB_COLLECTION
+    # Store the pricing data in DOcumentDB
+    document1 = client.CreateDocument(collectionUrl, exportDoc)
+
     print_prices(prices)
-
-    for symbol, price in prices.items():
-        # asset = Asset(symbol, full=True, bitshares_instance=ctx.bitshares)
-        flags = price["flags"]
-
-        # Prices that don't move sufficiently, or are not too old, can
-        # be skipped right away
-        if "min_change" not in flags and "over_max_age" not in flags:
-            continue
-
-        if (
-            ctx.obj["confirm_warning"] and
-            "over_warn_change" in flags and
-            "skip_change" not in flags
-        ):
-            if not confirmwarning(
-                "Price change for %s (%f) has been above 'warn_change'.  Please confirm!" % (
-                    symbol,
-                    price["priceChange"]
-                )
-            ):
-                continue
-
-        if "skip_change" in flags:
-            if ctx.obj["skip_critical"]:
-                alert(
-                    "Price change for %s (%f) has been above 'skip_change'.  Skipping!" % (
-                        symbol,
-                        price["priceChange"],
-                    )
-                )
-                exitcode = 1
-                continue
-            else:
-                if not confirmalert(
-                    "Price change for %s (%f) has been above 'skip_change'. Please confirm to still publish, else feed will be skipped!" % (
-                        symbol,
-                        price["priceChange"],
-                    )
-                ):
-                    continue
-
-        # Prices are denoted in `base`/`quote`. For a bitUSD feed, we
-        # want something like    0.05 USD per BTS. This makes "USD" the
-        # `base` and BTS the `quote`.
-        settlement_price = Price(
-            price["price"],
-            base=symbol,
-            quote=price["short_backing_symbol"])
-        cer = Price(
-            price["cer"],
-            base=symbol,
-            quote=price["short_backing_symbol"])
-        ctx.bitshares.publish_price_feed(
-            symbol,
-            settlement_price=settlement_price,
-            cer=cer,
-            mssr=price["mssr"],
-            mcr=price["mcr"],
-            account=ctx.config["producer"]
-        )
-
-    # Always ask for confirmation if this flag is set to true
-    if "confirm" in ctx.config and ctx.config["confirm"]:
-        ctx.bitshares.txbuffer.constructTx()
-        pprint(ctx.bitshares.txbuffer.json())
-        if not confirmwarning(
-            "Please confirm"
-        ):
-            return
-
-    if ctx.bitshares.txbuffer.ops:
-        ctx.bitshares.txbuffer.broadcast()
 
     sys.exit(exitcode)
 
