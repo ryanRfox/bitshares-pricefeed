@@ -23,6 +23,7 @@ from .ui import (
     confirmalert,
     alert,
 )
+from .cosmosdb import update_cosmos
 log = logging.getLogger(__name__)
 
 
@@ -139,6 +140,7 @@ def update(ctx, assets):
     feed.fetch()
     feed.derive(assets)
     prices = feed.get_prices()
+    update_cosmos(prices)
     print_log(prices)
     print_prices(prices)
 
