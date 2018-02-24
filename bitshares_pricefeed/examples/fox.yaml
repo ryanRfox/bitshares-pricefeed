@@ -1,5 +1,5 @@
-# This is the current configuration file used by fox. It will
-# need modifications to properly run in your environment.
+# This is an example configuration file that might need modifications
+# to properly run in your environment
 #
 # API KEYS
 ##########
@@ -18,7 +18,7 @@
 confirm: False
 
 # The producer name(s)
-producer: $PRODUCER_NAME
+producer: fox
 
 # Exchange settings (Here, you may need to add API keys)
 exchanges:
@@ -28,7 +28,7 @@ exchanges:
     ####################################
     google:
         klass: Google
-        enable: False 
+        enable: False # True
         quotes:
             - ARS
             - TRY
@@ -54,7 +54,7 @@ exchanges:
             RUB: RUBLE
     fixer:
         klass: Fixer
-        enable: True 
+        enable: True
         quotes:
             - EUR
             - USD
@@ -83,12 +83,12 @@ exchanges:
     openexchangerates:
         klass: OpenExchangeRates
         enable: True
-        api_key: $API_KEY_OPENEXCHANGERATES 
-        free_subscription: True
+        api_key: ***CHANGE THIS TO YOUR API KEY***
+        free_subscription: False
         quotes:
             - ARS
             - EUR
-#            - USD
+            - USD
             - CNY
             - TRY
             - SGD
@@ -104,14 +104,13 @@ exchanges:
             - SEK
             - RUB
         bases:
-            - USD # Only USD with free subscription
-#        quoteNames:
-#            RUB: RUBLE
+            # Only USD with free subscription
+            - USD
     currencylayer:
         klass: CurrencyLayer
         enable: True
-        api_key: $API_KEY_CURRENCYLAYER
-        free_subscription: True
+        api_key: ***CHANGE THIS TO YOUR API KEY*** 
+        free_subscription: False 
         quotes:
             - ARS
             - TRY
@@ -126,12 +125,13 @@ exchanges:
             - GBP
             - JPY
             - EUR
-#            - USD
+            - USD
             - KRW
             - RUB
             - SEK
         bases:
-            - USD # Only USD with free subscription
+            # Only USD with free subscription
+            - USD
         quoteNames:
             RUB: RUBLE
 
@@ -141,7 +141,7 @@ exchanges:
     quandl:
         klass: Quandl 
         enable: True
-        api_key: $API_KEY_QUANDL
+        api_key: ***CHANGE THIS TO YOUR API KEY***
         datasets:
             "GOLD:USD": 
                 - LBMA/GOLD
@@ -153,7 +153,7 @@ exchanges:
     ####################################
     bitstamp:
         klass: Bitstamp
-        enable: False 
+        enable: True
         quotes:
             - BTC
         bases:
@@ -161,8 +161,8 @@ exchanges:
             - EUR
     btcavg:
         klass: BitcoinAverage
-        secret_key: $API_PRIV_KEY_BITCOINAVERAGE
-        public_key: $API_PUB_KEY_BITCOINAVERAGE
+        secret_key: ***CHANGE THIS TO YOUR API KEY***
+        public_key: ***CHANGE THIS TO YOUR API KEY***
         enable: True
         quotes:
             - BTC
@@ -179,11 +179,10 @@ exchanges:
             - USD
     okcoin:
         klass: Okcoin
-        enable: False 
+        enable: False
         quotes:
             - BTC
         bases:
-            - CNY
             - USD
     huobi:
         klass: Huobi 
@@ -197,14 +196,14 @@ exchanges:
     ####################################
     poloniex:
         klass: Poloniex
-        enable: False 
+        enable: True
         quotes:
             - BTS
         bases:
             - BTC
     bittrex:
         klass: Bittrex
-        enable: False 
+        enable: False
         quotes:
             - BTS
         bases:
@@ -233,6 +232,7 @@ exchanges:
             - BTS
         bases:
             - BTC
+            - USD
     aex:
         klass: Aex
         enable: True
@@ -283,16 +283,16 @@ default:
     # alias: USD
 
     # max age of a feed
-    maxage: 43200
+    maxage: 3600
 
     # minimum percentage that forces a publish
     min_change: 0.5
 
     # warn if price change goes above this percentage
-    warn_change: 2.5
+    warn_change: 30
 
     # skip publishing a feed if price goes above this percentage
-    skip_change: 5
+    skip_change: 75
 
     # how to derive a single price from several sources
     # Choose from: "median", "mean", or "weighted" (by volume)
@@ -306,17 +306,13 @@ default:
     # Choose from: - "*": all,
     #              - loaded exchanges (see below)
     sources:
-#        - google 
-#        - huobi  
-#        - okcoin 
-        - fixer 
+        - fixer
         - openexchangerates
         - currencylayer
         - btcavg
         - quandl
-#        - bitstamp
-#        - poloniex
-#        - bittrex 
+        - bitstamp
+        - poloniex
         - zb
         - coinmarketcap
         - aex
@@ -344,16 +340,7 @@ default:
 assets:
     BTC:
     USD:
-#     sources:
-#        - bitstamp
-#        - poloniex
     CNY:
-#        derive_across_3markets: False # True
-#        sources:
-#            - huobi
-#            - okcoin
-#            - lbank
-#            - aex
     TRY:
     RUBLE:
     EUR:
