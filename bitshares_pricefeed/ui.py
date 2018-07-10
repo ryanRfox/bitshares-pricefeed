@@ -3,7 +3,7 @@ import click
 import logging
 import yaml
 from math import fabs
-from datetime import datetime
+from datetime import datetime, timezone
 from bitshares.price import Price
 from bitshares.asset import Asset
 from prettytable import PrettyTable
@@ -99,7 +99,7 @@ def print_prices(feeds):
         blockchain = float(Price(feed["global_feed"]["settlement_price"]))
         if "current_feed" in feed and feed["current_feed"]:
             last = float(feed["current_feed"]["settlement_price"])
-            age = (str(datetime.utcnow() - feed["current_feed"]["date"]))
+            age = (str(datetime.now(timezone.utc) - feed["current_feed"]["date"]))
         else:
             last = -1.0
             age = "unknown"
